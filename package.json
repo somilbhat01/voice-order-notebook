@@ -1,0 +1,22 @@
+{
+  "name": "voice-order-notebook",
+  "version": "1.0.0",
+  "description": "Voice Order Notebook powered by Gnani Prisma",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "gnani",
+    "prisma",
+    "voice",
+    "stt",
+    "hindi",
+    "hinglish"
+  ],
+  "author": "",
+  "license": "ISC"
+}

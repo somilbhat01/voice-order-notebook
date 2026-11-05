@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice Order Notebook</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: -apple-system, system-ui, sans-serif; background: #f6f4ef; color: #1f1f1f; margin: 0; }
+  main { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* Header */
+  h1 { margin: 0 0 4px; font-size: 28px; font-weight: 700; }
+  .sub { color: #666; margin: 0 0 28px; font-size: 15px; }
+
+  /* Mic button */
+  #mic {
+    font-size: 16px; padding: 14px 24px; border: 0; border-radius: 12px;
+    background: #1f1f1f; color: #fff; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600; transition: background .15s;
+  }
+  #mic:hover { background: #333; }
+  #mic.rec  { background: #c0392b; }
+  #mic.rec:hover { background: #a93226; }
+
+  /* Status + spinner */
+  #status { color: #555; min-height: 24px; margin: 10px 0 0; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid #ccc;
+    border-top-color: #555; border-radius: 50%;
+    animation: spin .6s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Cards */
+  .card { background: #fff; border-radius: 16px; padding: 20px; margin-top: 20px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #999; margin: 0 0 6px; font-weight: 600; }
+
+  /* Transcript */
+  #transcript { font-size: 17px; margin: 0 0 18px; line-height: 1.5; color: #333; }
+
+  /* Customer input */
+  #customer {
+    width: 100%; padding: 10px 12px; border: 1.5px solid #e5e5e5; border-radius: 10px;
+    font-size: 16px; margin-bottom: 18px; outline: none; transition: border .15s;
+  }
+  #customer:focus { border-color: #1f1f1f; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+  th { text-align: left; font-size: 11px; color: #999; font-weight: 600; padding: 4px 6px;
+       text-transform: uppercase; letter-spacing: .05em; }
+  td { padding: 3px 4px; }
+  td input {
+    width: 100%; padding: 8px 10px; border: 1.5px solid #e8e8e8; border-radius: 8px;
+    font-size: 15px; outline: none; transition: border .15s; background: #fafafa;
+  }
+  td input:focus { border-color: #1f1f1f; background: #fff; }
+  td.qty-cell  { width: 72px; }
+  td.unit-cell { width: 90px; }
+  td.del-cell  { width: 36px; text-align: center; }
+
+  /* Delete row */
+  .del-row {
+    background: none; border: none; cursor: pointer; font-size: 20px;
+    color: #ccc; line-height: 1; padding: 2px 6px; border-radius: 6px;
+    transition: color .15s;
+  }
+  .del-row:hover { color: #c0392b; }
+
+  /* Add row */
+  #add-row {
+    background: none; border: 1.5px dashed #ccc; color: #888; cursor: pointer;
+    font-size: 14px; padding: 8px 14px; border-radius: 8px; margin-top: 8px;
+    transition: all .15s; width: 100%;
+  }
+  #add-row:hover { border-color: #888; color: #333; }
+
+  /* Action buttons */
+  .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .btn-save {
+    font-size: 15px; padding: 12px 20px; border: 0; border-radius: 10px;
+    background: #1f1f1f; color: #fff; cursor: pointer; font-weight: 600; flex: 1;
+    transition: background .15s;
+  }
+  .btn-save:hover { background: #333; }
+  .btn-wa {
+    font-size: 15px; padding: 12px 20px; border: 0; border-radius: 10px;
+    background: #25D366; color: #fff; cursor: pointer; font-weight: 600; flex: 1;
+    transition: background .15s;
+  }
+  .btn-wa:hover { background: #1db954; }
+
+  /* Saved orders */
+  h2 { font-size: 20px; margin: 32px 0 0; }
+  #saved { min-height: 48px; }
+  .empty { color: #999; font-size: 15px; margin: 0; }
+  .order { border-top: 1px solid #f0f0f0; padding: 14px 0; }
+  .order:first-child { border-top: none; }
+  .order-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .order-customer { font-weight: 700; font-size: 16px; }
+  .order-time { font-size: 12px; color: #aaa; }
+  .order-item { font-size: 14px; color: #444; line-height: 1.9; }
+  .order-item::before { content: "• "; color: #bbb; }
+  .order-when { color: #aaa; font-style: italic; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🎙️ Voice Order Notebook</h1>
+  <p class="sub">Say the order in Hindi or Hinglish. Powered by Gnani Prisma.</p>
+
+  <button id="mic">🎤 Start recording</button>
+  <p id="status"></p>
+
+  <section id="result" class="card" hidden>
+    <p class="label">What I heard</p>
+    <p id="transcript"></p>
+
+    <p class="label">Customer</p>
+    <input id="customer" placeholder="Customer name">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="qty-cell">Qty</th>
+          <th class="unit-cell">Unit</th>
+          <th>When</th>
+          <th class="del-cell"></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <button id="add-row">+ Add item</button>
+
+    <div class="actions">
+      <button class="btn-save" id="save">💾 Save order</button>
+      <button class="btn-wa"   id="whatsapp">📲 Share on WhatsApp</button>
+    </div>
+  </section>
+
+  <h2>Saved orders</h2>
+  <div id="saved" class="card"><p class="empty">No orders yet.</p></div>
+</main>
+
+<script>
+const mic      = document.getElementById("mic");
+const statusEl = document.getElementById("status");
+const result   = document.getElementById("result");
+let recorder = null;
+let chunks   = [];
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;" ).replace(/>/g, "&gt;" );
+}
+
+function setStatus(msg, spinning) {
+  statusEl.innerHTML = spinning
+    ? '<span class="spinner"></span>' + esc(msg)
+    : esc(msg);
+}
+
+/* ── WAV encoder ── */
+function encodeWav(samples, rate) {
+  const buf = new ArrayBuffer(44 + samples.length * 2);
+  const v   = new DataView(buf);
+  const w   = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); w(8, "WAVE");
+  w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  w(36, "data"); v.setUint32(40, samples.length * 2, true);
+  let off = 44;
+  for (let i = 0; i < samples.length; i++, off += 2) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    v.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+async function toWav(blob) {
+  const arr     = await blob.arrayBuffer();
+  const ctx     = new (window.AudioContext || window.webkitAudioContext)();
+  const decoded = await ctx.decodeAudioData(arr);
+  const rate    = 16000;
+  const offline = new OfflineAudioContext(1, Math.ceil(decoded.duration * rate), rate);
+  const src     = offline.createBufferSource();
+  src.buffer    = decoded;
+  src.connect(offline.destination);
+  src.start();
+  const rendered = await offline.startRendering();
+  ctx.close();
+  return encodeWav(rendered.getChannelData(0), rate);
+}
+
+/* ── Recording ── */
+mic.onclick = async () => {
+  if (recorder && recorder.state === "recording") { recorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recorder = new MediaRecorder(stream);
+    chunks   = [];
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = async () => {
+      stream.getTracks().forEach((t) => t.stop());
+      mic.textContent = "🎤 Start recording";
+      mic.classList.remove("rec");
+      await processAudio(new Blob(chunks, { type: recorder.mimeType }));
+    };
+    recorder.start();
+    mic.textContent = "⏹ Stop";
+    mic.classList.add("rec");
+    setStatus("Listening… press Stop when done.");
+  } catch (e) {
+    setStatus("Microphone error: " + e.message);
+  }
+};
+
+async function processAudio(blob) {
+  try {
+    setStatus("Understanding your order…", true);
+    const wav = await toWav(blob);
+    const res = await fetch("/api/order", { method: "POST", body: wav });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Something went wrong");
+    showOrder(data);
+    setStatus("Check the order below — fix anything, then save.");
+  } catch (e) {
+    setStatus("Error: " + e.message);
+  }
+}
+
+/* ── Build a single table row ── */
+function makeRow(it) {
+  const tr = document.createElement("tr");
+  tr.innerHTML =
+    '<td><input value="' + esc(it.item)     + '" placeholder="Item name"></td>' +
+    '<td class="qty-cell"><input value="'  + esc(it.quantity) + '" type="number" min="0.5" step="0.5"></td>' +
+    '<td class="unit-cell"><input value="' + esc(it.unit)     + '"></td>' +
+    '<td><input value="'                   + esc(it.when)     + '"></td>' +
+    '<td class="del-cell"><button class="del-row" title="Remove row">×</button></td>';
+  tr.querySelector(".del-row").onclick = () => tr.remove();
+  return tr;
+}
+
+function showOrder(data) {
+  document.getElementById("transcript").textContent = data.transcript;
+  document.getElementById("customer").value          = data.customer;
+  const rows = document.getElementById("rows");
+  rows.innerHTML = "";
+  data.items.forEach((it) => rows.appendChild(makeRow(it)));
+  result.hidden = false;
+}
+
+/* Add blank row */
+document.getElementById("add-row").onclick = () => {
+  document.getElementById("rows").appendChild(
+    makeRow({ item: "", quantity: 1, unit: "pc", when: "Not specified" })
+  );
+};
+
+/* ── Collect current table data ── */
+function collectOrder() {
+  const items = [...document.querySelectorAll("#rows tr")].map((tr) => {
+    const f = tr.querySelectorAll("input");
+    return { item: f[0].value, quantity: Number(f[1].value) || 1, unit: f[2].value, when: f[3].value };
+  });
+  return {
+    customer:   document.getElementById("customer").value || "Unknown",
+    transcript: document.getElementById("transcript").textContent,
+    items,
+  };
+}
+
+/* ── Save ── */
+document.getElementById("save").onclick = async () => {
+  const body = collectOrder();
+  await fetch("/api/save", { method: "POST", body: JSON.stringify(body) });
+  result.hidden = true;
+  setStatus("✅ Order saved.");
+  loadSaved();
+};
+
+/* ── WhatsApp share ── */
+document.getElementById("whatsapp").onclick = () => {
+  const { customer, items } = collectOrder();
+  const lines = ["*Order — " + customer + "*", ""];
+  items.forEach((it) => {
+    const when = it.when && it.when !== "Not specified" ? " (" + it.when + ")" : "";
+    lines.push("• " + it.quantity + " " + it.unit + " " + it.item + when);
+  });
+  lines.push("", "_Via Voice Order Notebook · Gnani Prisma_");
+  window.open("https://wa.me/?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+};
+
+/* ── Saved orders list ── */
+async function loadSaved() {
+  const res    = await fetch("/api/orders");
+  const orders = await res.json();
+  const box    = document.getElementById("saved");
+  if (!orders.length) {
+    box.innerHTML = '<p class="empty">No orders yet.</p>';
+    return;
+  }
+  box.innerHTML = orders.map((o) =>
+    '<div class="order">' +
+      '<div class="order-header">' +
+        '<span class="order-customer">' + esc(o.customer) + '</span>' +
+        '<span class="order-time">'     + new Date(o.savedAt).toLocaleString("en-IN") + '</span>' +
+      '</div>' +
+      o.items.map((i) =>
+        '<div class="order-item">' +
+          esc(i.quantity + " " + i.unit + " " + i.item) +
+          (i.when && i.when !== "Not specified"
+            ? ' <span class="order-when">— ' + esc(i.when) + '</span>' : "") +
+        '</div>'
+      ).join("") +
+    "</div>"
+  ).join("");
+}
+
+loadSaved();
+</script>
+</body>
+</html>

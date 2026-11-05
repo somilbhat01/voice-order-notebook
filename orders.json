@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1793898589865,
+    "savedAt": "2026-11-05T17:09:49.865Z",
+    "customer": "शर्मा जी",
+    "transcript": "शर्मा जी को कल सुबह 07:00 बजे 2 के जी आटा और शाम 05:00 बजे 3 पास्ता के पैकेट और 3 लीटर वाली 2 तेल की चाहिए",
+    "items": [
+      {
+        "item": "Atta",
+        "quantity": 2,
+        "unit": "kg",
+        "when": "Tomorrow morning"
+      },
+      {
+        "item": "Pasta",
+        "quantity": 3,
+        "unit": "packet",
+        "when": "Tomorrow morning"
+      },
+      {
+        "item": "Oil",
+        "quantity": 2,
+        "unit": "pc",
+        "when": "Tomorrow morning"
+      }
+    ]
+  }
+]
