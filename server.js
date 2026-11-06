@@ -68,6 +68,7 @@ const handleRequest = async (req, res) => {
         savedAt: new Date().toISOString(),
         status: body.status || "pending",
         payment: body.payment || "unpaid",
+        paymentMethod: body.paymentMethod || (body.payment === "paid" ? "Cash" : "Udhaar"),
         totalAmount: Number(body.totalAmount) || 0,
         ...body,
       });
