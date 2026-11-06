@@ -6,8 +6,8 @@
 <title>Voice Order Notebook & Khata</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-  body { font-family: -apple-system, system-ui, sans-serif; background: #f5f4ef; color: #1e1e1e; margin: 0; }
-  main { max-width: 780px; margin: 0 auto; padding: 28px 20px 80px; }
+  body { font-family: -apple-system, system-ui, sans-serif; background: #f6f5f0; color: #1a1a1a; margin: 0; }
+  main { max-width: 740px; margin: 0 auto; padding: 32px 20px 80px; }
 
   /* Header */
   .header-tag { display: inline-block; font-size: 11px; font-weight: 700; color: #d97706; background: #fef3c7; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
@@ -17,8 +17,8 @@
   /* Record bar */
   .record-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
   #mic {
-    font-size: 16px; padding: 13px 22px; border: 0; border-radius: 12px;
-    background: #1f1f1f; color: #fff; cursor: pointer;
+    font-size: 15px; padding: 13px 22px; border: 0; border-radius: 12px;
+    background: #1a1a1a; color: #fff; cursor: pointer;
     display: inline-flex; align-items: center; gap: 8px;
     font-weight: 600; transition: background .15s, transform .05s;
   }
@@ -27,30 +27,30 @@
   #mic.rec { background: #dc2626; animation: pulse 1.2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
 
-  #status { color: #555; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  #status { color: #666; font-size: 14px; display: flex; align-items: center; gap: 8px; }
   .spinner {
     width: 15px; height: 15px; border: 2px solid #ccc;
-    border-top-color: #1f1f1f; border-radius: 50%;
+    border-top-color: #1a1a1a; border-radius: 50%;
     animation: spin .6s linear infinite; flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Card */
-  .card { background: #fff; border-radius: 16px; padding: 20px; margin-top: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #ebe9e1; }
+  .card { background: #fff; border-radius: 16px; padding: 20px; margin-top: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1px solid #ebe8e1; }
   .label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #888; margin: 0 0 6px; font-weight: 700; }
 
   /* Transcript */
-  #transcript { font-size: 16px; margin: 0 0 16px; line-height: 1.5; color: #2d3748; background: #fafaf7; padding: 10px 14px; border-radius: 10px; border-left: 3px solid #d97706; }
+  #transcript { font-size: 15px; margin: 0 0 16px; line-height: 1.5; color: #2d3748; background: #fafaf7; padding: 10px 14px; border-radius: 10px; border-left: 3px solid #d97706; }
 
   /* Inputs grid */
-  .meta-grid { display: grid; grid-template-columns: 2fr 1fr 1.4fr; gap: 12px; margin-bottom: 16px; }
+  .meta-grid { display: grid; grid-template-columns: 2fr 1fr 1.3fr; gap: 12px; margin-bottom: 16px; }
   @media (max-width: 600px) { .meta-grid { grid-template-columns: 1fr; } }
   .input-group label { display: block; font-size: 11px; text-transform: uppercase; color: #888; font-weight: 700; margin-bottom: 4px; }
   .input-group input, .input-group select {
     width: 100%; padding: 9px 12px; border: 1.5px solid #e2e0d8; border-radius: 9px;
-    font-size: 14px; background: #fff; color: #1e1e1e; outline: none;
+    font-size: 14px; background: #fff; color: #1a1a1a; outline: none;
   }
-  .input-group input:focus, .input-group select:focus { border-color: #1f1f1f; }
+  .input-group input:focus, .input-group select:focus { border-color: #1a1a1a; }
 
   /* Table */
   table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
@@ -60,7 +60,7 @@
     width: 100%; padding: 8px 10px; border: 1.5px solid #e5e3dc; border-radius: 8px;
     font-size: 14px; outline: none; background: #fafaf7;
   }
-  td input:focus { border-color: #1f1f1f; background: #fff; }
+  td input:focus { border-color: #1a1a1a; background: #fff; }
   td.qty-cell  { width: 72px; }
   td.unit-cell { width: 90px; }
   td.del-cell  { width: 34px; text-align: center; }
@@ -78,10 +78,10 @@
   #add-row:hover { border-color: #444; color: #111; }
 
   /* Action buttons */
-  .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .actions { display: flex; gap: 10px; margin-top: 18px; }
   .btn-save {
     font-size: 15px; padding: 12px 20px; border: 0; border-radius: 10px;
-    background: #1f1f1f; color: #fff; cursor: pointer; font-weight: 700; flex: 1;
+    background: #1a1a1a; color: #fff; cursor: pointer; font-weight: 700; flex: 1;
   }
   .btn-save:hover { background: #333; }
   .btn-wa {
@@ -92,9 +92,9 @@
 
   /* ── Stats Dashboard ── */
   .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 28px 0 16px; }
-  .stat-card { background: #fff; border: 1px solid #ebe9e1; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .stat-card { background: #fff; border: 1px solid #ebe8e1; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
   .stat-card .stat-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: 700; margin-bottom: 2px; }
-  .stat-card .stat-val { font-size: 20px; font-weight: 800; color: #1e1e1e; }
+  .stat-card .stat-val { font-size: 20px; font-weight: 800; color: #1a1a1a; }
   .stat-card.alert .stat-val { color: #dc2626; }
 
   /* Filter pills */
@@ -103,67 +103,60 @@
     border: 1px solid #dcdad0; background: #fff; color: #666; font-size: 13px; font-weight: 600;
     padding: 6px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all .15s;
   }
-  .filter-btn.active { background: #1f1f1f; color: #fff; border-color: #1f1f1f; }
+  .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
 
-  /* Orders Khata list */
+  /* ── Minimalist Order Card ── */
   .order-item-card {
-    background: #fff; border-radius: 14px; border: 1.5px solid #ebe9e1;
-    padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
-    transition: border-color .15s, background .15s;
+    background: #fff; border-radius: 14px; border: 1px solid #ebe8e1;
+    padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.03);
+    transition: all .15s;
   }
-  .order-item-card.is-delivered {
-    border-left: 5px solid #16a34a; background: #fcfffd;
-  }
-  .order-item-card.is-pending {
-    border-left: 5px solid #d97706;
-  }
+  .order-item-card.is-delivered { border-left: 4px solid #16a34a; }
+  .order-item-card.is-pending   { border-left: 4px solid #d97706; }
 
-  .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-  .order-cust { font-size: 18px; font-weight: 800; color: #111; }
-  .order-date { font-size: 12px; color: #999; margin-top: 2px; }
+  .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .order-cust { font-size: 17px; font-weight: 800; color: #111; }
+  .order-date { font-size: 12px; color: #999; margin-top: 1px; }
 
-  .badge-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
-    padding: 4px 10px; border-radius: 8px; border: 1px solid transparent;
+  /* Interactive Pill Badges */
+  .pills-group { display: flex; gap: 6px; }
+  .pill-toggle {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+    padding: 5px 11px; border-radius: 20px; cursor: pointer; border: 1px solid transparent;
+    user-select: none; transition: transform .08s, opacity .15s;
   }
-  .badge.pending-del { background: #fef3c7; color: #b45309; border-color: #fde68a; }
-  .badge.done-del    { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
-  .badge.unpaid      { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
-  .badge.paid        { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+  .pill-toggle:hover { opacity: .88; transform: translateY(-1px); }
+  .pill-toggle:active { transform: translateY(0); }
 
-  .order-lines { margin: 10px 0 14px; padding-left: 18px; color: #333; font-size: 14px; line-height: 1.8; }
+  .pill-pending   { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+  .pill-delivered { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+  .pill-udhaar    { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+  .pill-paid      { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+
+  .order-lines { margin: 8px 0 14px; padding-left: 18px; color: #333; font-size: 14px; line-height: 1.8; }
   .order-when-tag { color: #888; font-size: 12px; font-style: italic; }
 
-  /* Bottom Actions Bar */
+  /* Clean Footer */
   .order-footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid #f0eee6; padding-top: 12px; flex-wrap: wrap; gap: 10px;
+    border-top: 1px solid #f2f0ea; padding-top: 10px;
   }
-  .order-amount-box { font-weight: 800; font-size: 16px; color: #1e1e1e; }
-  .order-amount-sub { font-size: 12px; font-weight: 500; color: #777; display: block; }
+  .order-amount-text { font-size: 14px; color: #444; font-weight: 600; }
+  .order-amount-val  { font-weight: 800; font-size: 16px; color: #111; }
 
-  .action-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-  .btn-action {
-    border: 1px solid #d1d5db; background: #f9fafb; color: #374151; font-size: 12px; font-weight: 700;
-    padding: 7px 12px; border-radius: 8px; cursor: pointer; transition: all .15s;
-    display: inline-flex; align-items: center; gap: 4px;
+  .footer-actions { display: flex; align-items: center; gap: 8px; }
+  .btn-wa-pill {
+    background: #25D366; color: #fff; border: 0; font-size: 12px; font-weight: 700;
+    padding: 6px 14px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+    transition: background .15s;
   }
-  .btn-action:hover { background: #f3f4f6; border-color: #9ca3af; }
+  .btn-wa-pill:hover { background: #1eb954; }
 
-  .btn-action.btn-deliver { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
-  .btn-action.btn-deliver:hover { background: #d1fae5; }
-  .btn-action.btn-undeliver { background: #fffbeb; border-color: #fde68a; color: #b45309; }
-
-  .btn-action.btn-pay { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
-  .btn-action.btn-pay:hover { background: #dbeafe; }
-  .btn-action.btn-unpay { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
-
-  .btn-action.btn-wa-action { background: #25D366; border-color: #25D366; color: #fff; }
-  .btn-action.btn-wa-action:hover { background: #1eb954; }
-
-  .btn-action.btn-del-action { color: #9ca3af; border-color: transparent; background: transparent; }
-  .btn-action.btn-del-action:hover { color: #dc2626; background: #fee2e2; }
+  .btn-del-icon {
+    background: none; border: none; cursor: pointer; font-size: 16px; color: #aaa;
+    padding: 4px 6px; border-radius: 6px; transition: color .15s;
+  }
+  .btn-del-icon:hover { color: #dc2626; }
 
   .empty-box { text-align: center; color: #999; padding: 28px 0; font-size: 15px; }
 </style>
@@ -186,7 +179,7 @@
 
     <div class="meta-grid">
       <div class="input-group">
-        <label>Customer Name (ग्राहक का नाम)</label>
+        <label>Customer Name (ग्राहक)</label>
         <input id="customer" placeholder="e.g. शर्मा जी">
       </div>
       <div class="input-group">
@@ -194,7 +187,7 @@
         <input id="amount" type="number" placeholder="0">
       </div>
       <div class="input-group">
-        <label>Payment Mode (पेमेंट)</label>
+        <label>Payment (पेमेंट)</label>
         <select id="payment-mode">
           <option value="udhaar">📕 Udhaar / Unpaid (उधार बाकी)</option>
           <option value="cash">💵 Paid via Cash (नकद)</option>
@@ -209,7 +202,7 @@
           <th>Item</th>
           <th class="qty-cell">Qty</th>
           <th class="unit-cell">Unit</th>
-          <th>When (डिलीवरी समय)</th>
+          <th>When (डिलीवरी)</th>
           <th class="del-cell"></th>
         </tr>
       </thead>
@@ -242,8 +235,8 @@
 
   <div class="filter-bar">
     <button class="filter-btn active" data-filter="all">All Orders (सभी)</button>
-    <button class="filter-btn" data-filter="pending">⏳ Pending Delivery (बाकी डिलीवरी)</button>
-    <button class="filter-btn" data-filter="unpaid">📕 Udhaar (उधार बाकी)</button>
+    <button class="filter-btn" data-filter="pending">⏳ Pending Delivery (बाकी)</button>
+    <button class="filter-btn" data-filter="unpaid">📕 Udhaar (उधार)</button>
     <button class="filter-btn" data-filter="completed">✅ Delivered (डिलीवर हो गए)</button>
   </div>
 
@@ -359,7 +352,6 @@ function showOrder(data) {
   document.getElementById("customer").value = data.customer || "";
   document.getElementById("amount").value = data.totalAmount || "";
 
-  // Map payment method
   const pMode = document.getElementById("payment-mode");
   if (data.paymentMethod === "UPI") pMode.value = "upi";
   else if (data.paymentMethod === "Cash" || data.payment === "paid") pMode.value = "cash";
@@ -404,7 +396,7 @@ document.getElementById("save").onclick = async () => {
   const body = collectActiveOrder();
   await fetch("/api/save", { method: "POST", body: JSON.stringify(body) });
   result.hidden = true;
-  setStatus("✅ Saved to Khata / Notebook!");
+  setStatus("✅ Saved to Notebook!");
   loadOrders();
 };
 
@@ -412,7 +404,7 @@ document.getElementById("save").onclick = async () => {
 function formatWhatsAppText(order) {
   const dateStr = new Date(order.savedAt || Date.now()).toLocaleDateString("en-IN");
   const isPaid = order.payment === "paid";
-  const payLabel = isPaid ? `✅ Paid via ${order.paymentMethod || "Cash"}` : "⚠️ बाकी / उधार (Payment Pending)";
+  const payLabel = isPaid ? `✅ Paid (${order.paymentMethod || "Cash"})` : "⚠️ बाकी / उधार (Payment Pending)";
   const statusLabel = order.status === "delivered" ? "✅ Delivered (डिलीवर हो गया)" : "⏳ Pending Delivery (तैयार हो रहा है)";
 
   const lines = [
@@ -431,12 +423,12 @@ function formatWhatsAppText(order) {
 
   lines.push("");
   if (order.totalAmount) {
-    lines.push("*कुल रकम (Total Bill):* ₹" + order.totalAmount);
+    lines.push("*कुल बिल (Total):* ₹" + order.totalAmount);
   }
   lines.push("*पेमेंट:* " + payLabel);
   lines.push("*डिलीवरी स्थिति:* " + statusLabel);
   lines.push("-----------------------------");
-  lines.push("_Generated via Voice Order Notebook · Powered by Gnani Prisma_");
+  lines.push("_Order created via Voice Order Notebook · Powered by Gnani Prisma_");
 
   return encodeURIComponent(lines.join("\n"));
 }
@@ -502,14 +494,16 @@ function renderDashboard() {
     const isPaid = o.payment === "paid";
     const cardClass = isDelivered ? "is-delivered" : "is-pending";
 
-    const delBadgeClass = isDelivered ? "done-del" : "pending-del";
-    const delBadgeText = isDelivered ? "✅ Delivered" : "⏳ Pending Delivery";
+    const delClass = isDelivered ? "pill-delivered" : "pill-pending";
+    const delText = isDelivered ? "✅ Delivered" : "⏳ Pending";
+    const nextStatus = isDelivered ? "pending" : "delivered";
 
-    const payBadgeClass = isPaid ? "paid" : "unpaid";
-    const pMethod = o.paymentMethod || (isPaid ? "Cash" : "Udhaar");
-    const payBadgeText = isPaid
-      ? `💰 Paid (${pMethod})`
-      : `📕 ₹${o.totalAmount || 0} Udhaar (बाकी)`;
+    const payClass = isPaid ? "pill-paid" : "pill-udhaar";
+    const payText = isPaid
+      ? `💰 Paid (${o.paymentMethod || "Cash"})`
+      : `📕 ₹${o.totalAmount || 0} Udhaar`;
+    const nextPayment = isPaid ? "unpaid" : "paid";
+    const nextMethod = isPaid ? "Udhaar" : "Cash";
 
     return `
       <div class="order-item-card ${cardClass}">
@@ -518,9 +512,16 @@ function renderDashboard() {
             <span class="order-cust">${esc(o.customer)}</span>
             <div class="order-date">${new Date(o.savedAt).toLocaleString("en-IN")}</div>
           </div>
-          <div class="badge-group">
-            <span class="badge ${delBadgeClass}">${delBadgeText}</span>
-            <span class="badge ${payBadgeClass}">${payBadgeText}</span>
+          <div class="pills-group">
+            <!-- 1-Tap Delivery Toggle Pill -->
+            <span class="pill-toggle ${delClass}" onclick="updateOrder(${o.id}, { status: '${nextStatus}' })" title="Tap to toggle Delivery status">
+              ${delText}
+            </span>
+
+            <!-- 1-Tap Payment Toggle Pill -->
+            <span class="pill-toggle ${payClass}" onclick="updateOrder(${o.id}, { payment: '${nextPayment}', paymentMethod: '${nextMethod}' })" title="Tap to toggle Payment">
+              ${payText}
+            </span>
           </div>
         </div>
 
@@ -534,28 +535,13 @@ function renderDashboard() {
         </ul>
 
         <div class="order-footer">
-          <div class="order-amount-box">
-            ${o.totalAmount ? "₹" + o.totalAmount : "No bill set"}
-            <span class="order-amount-sub">${isPaid ? "Payment cleared" : "Udhaar outstanding"}</span>
+          <div class="order-amount-text">
+            ${o.totalAmount ? `Total: <span class="order-amount-val">₹${o.totalAmount}</span>` : `<span style="color:#999">No bill amount set</span>`}
           </div>
 
-          <div class="action-buttons">
-            <!-- Delivery Toggle Button -->
-            ${!isDelivered
-              ? `<button class="btn-action btn-deliver" onclick="updateOrder(${o.id}, { status: 'delivered' })">📦 Mark Delivered</button>`
-              : `<button class="btn-action btn-undeliver" onclick="updateOrder(${o.id}, { status: 'pending' })">↩️ Move to Pending</button>`
-            }
-
-            <!-- Payment Toggle Button -->
-            ${!isPaid
-              ? `<button class="btn-action btn-pay" onclick="updateOrder(${o.id}, { payment: 'paid', paymentMethod: 'Cash' })">💵 Mark Paid (Cash)</button>
-                 <button class="btn-action btn-pay" onclick="updateOrder(${o.id}, { payment: 'paid', paymentMethod: 'UPI' })">📱 Mark Paid (UPI)</button>`
-              : `<button class="btn-action btn-unpay" onclick="updateOrder(${o.id}, { payment: 'unpaid', paymentMethod: 'Udhaar' })">📕 Move to Udhaar</button>`
-            }
-
-            <!-- WhatsApp & Delete -->
-            <button class="btn-action btn-wa-action" onclick="window.open('https://wa.me/?text=${formatWhatsAppText(o)}', '_blank')">📲 WhatsApp</button>
-            <button class="btn-action btn-del-action" onclick="deleteOrder(${o.id})" title="Delete order">🗑️</button>
+          <div class="footer-actions">
+            <button class="btn-wa-pill" onclick="window.open('https://wa.me/?text=${formatWhatsAppText(o)}', '_blank')">📲 WhatsApp Slip</button>
+            <button class="btn-del-icon" onclick="deleteOrder(${o.id})" title="Delete order">🗑️</button>
           </div>
         </div>
       </div>
