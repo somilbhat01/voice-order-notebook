@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { extractOrder } = require("./extract");
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const API_KEY = process.env.GNANI_API_KEY;
 const ORDERS_FILE = path.join(__dirname, "orders.json");
 
@@ -40,8 +40,13 @@ function send(res, status, obj) {
   res.end(JSON.stringify(obj));
 }
 
-const server = http.createServer(async (req, res) => {
+const handleRequest = async (req, res) => {
   try {
+    if (req.method === "GET" && (req.url === "/health" || req.url === "/ping")) {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      return res.end("OK");
+    }
+
     if (req.method === "GET" && req.url === "/") {
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       return res.end(fs.readFileSync(path.join(__dirname, "index.html")));
@@ -73,6 +78,21 @@ const server = http.createServer(async (req, res) => {
     console.error(e);
     send(res, 500, { error: e.message });
   }
+};
+
+const server = http.createServer(handleRequest);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server listening on 0.0.0.0:${PORT}`);
 });
 
-server.listen(PORT, () => console.log("Running at http://localhost:" + PORT));
+// If Railway assigned a different PORT (e.g., 8080), also listen on 3000 to match proxy settings
+if (PORT !== 3000) {
+  try {
+    const backupServer = http.createServer(handleRequest);
+    backupServer.listen(3000, "0.0.0.0", () => {
+      console.log("Also listening on 0.0.0.0:3000");
+    });
+  } catch (err) {
+    console.error("Backup listener on 3000 error:", err.message);
+  }
+}
