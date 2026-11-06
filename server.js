@@ -63,7 +63,34 @@ const handleRequest = async (req, res) => {
     if (req.method === "POST" && req.url === "/api/save") {
       const body = JSON.parse((await readBody(req)).toString("utf8"));
       const orders = loadOrders();
-      orders.unshift({ id: Date.now(), savedAt: new Date().toISOString(), ...body });
+      orders.unshift({
+        id: Date.now(),
+        savedAt: new Date().toISOString(),
+        status: body.status || "pending",
+        payment: body.payment || "unpaid",
+        totalAmount: Number(body.totalAmount) || 0,
+        ...body,
+      });
+      fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+      return send(res, 200, { ok: true });
+    }
+
+    if (req.method === "POST" && req.url === "/api/order/update") {
+      const { id, updates } = JSON.parse((await readBody(req)).toString("utf8"));
+      const orders = loadOrders();
+      const idx = orders.findIndex((o) => o.id === id);
+      if (idx !== -1) {
+        orders[idx] = { ...orders[idx], ...updates };
+        fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+        return send(res, 200, { ok: true, order: orders[idx] });
+      }
+      return send(res, 404, { error: "Order not found" });
+    }
+
+    if (req.method === "POST" && req.url === "/api/order/delete") {
+      const { id } = JSON.parse((await readBody(req)).toString("utf8"));
+      let orders = loadOrders();
+      orders = orders.filter((o) => o.id !== id);
       fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
       return send(res, 200, { ok: true });
     }

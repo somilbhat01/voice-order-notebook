@@ -3,123 +3,180 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Voice Order Notebook</title>
+<title>Voice Order Notebook & Khata</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-  body { font-family: -apple-system, system-ui, sans-serif; background: #f6f4ef; color: #1f1f1f; margin: 0; }
-  main { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+  body { font-family: -apple-system, system-ui, sans-serif; background: #f5f4ef; color: #1e1e1e; margin: 0; }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 20px 80px; }
 
   /* Header */
-  h1 { margin: 0 0 4px; font-size: 28px; font-weight: 700; }
-  .sub { color: #666; margin: 0 0 28px; font-size: 15px; }
+  .header-tag { display: inline-block; font-size: 11px; font-weight: 700; color: #d97706; background: #fef3c7; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  h1 { margin: 0 0 6px; font-size: 28px; font-weight: 800; }
+  .sub { color: #666; margin: 0 0 24px; font-size: 15px; }
 
-  /* Mic button */
+  /* Record bar */
+  .record-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
   #mic {
-    font-size: 16px; padding: 14px 24px; border: 0; border-radius: 12px;
+    font-size: 16px; padding: 13px 22px; border: 0; border-radius: 12px;
     background: #1f1f1f; color: #fff; cursor: pointer;
     display: inline-flex; align-items: center; gap: 8px;
-    font-weight: 600; transition: background .15s;
+    font-weight: 600; transition: background .15s, transform .05s;
   }
   #mic:hover { background: #333; }
-  #mic.rec  { background: #c0392b; }
-  #mic.rec:hover { background: #a93226; }
+  #mic:active { transform: scale(0.98); }
+  #mic.rec { background: #dc2626; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
 
-  /* Status + spinner */
-  #status { color: #555; min-height: 24px; margin: 10px 0 0; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  #status { color: #555; font-size: 14px; display: flex; align-items: center; gap: 8px; }
   .spinner {
-    width: 16px; height: 16px; border: 2px solid #ccc;
-    border-top-color: #555; border-radius: 50%;
+    width: 15px; height: 15px; border: 2px solid #ccc;
+    border-top-color: #1f1f1f; border-radius: 50%;
     animation: spin .6s linear infinite; flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Cards */
-  .card { background: #fff; border-radius: 16px; padding: 20px; margin-top: 20px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
-  .label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #999; margin: 0 0 6px; font-weight: 600; }
+  /* Card */
+  .card { background: #fff; border-radius: 16px; padding: 20px; margin-top: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border: 1px solid #ebe9e1; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #888; margin: 0 0 6px; font-weight: 700; }
 
   /* Transcript */
-  #transcript { font-size: 17px; margin: 0 0 18px; line-height: 1.5; color: #333; }
+  #transcript { font-size: 16px; margin: 0 0 16px; line-height: 1.5; color: #2d3748; background: #fafaf7; padding: 10px 14px; border-radius: 10px; border-left: 3px solid #d97706; }
 
-  /* Customer input */
-  #customer {
-    width: 100%; padding: 10px 12px; border: 1.5px solid #e5e5e5; border-radius: 10px;
-    font-size: 16px; margin-bottom: 18px; outline: none; transition: border .15s;
+  /* Inputs grid */
+  .meta-grid { display: grid; grid-template-columns: 2fr 1fr 1.2fr; gap: 12px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .meta-grid { grid-template-columns: 1fr; } }
+  .input-group label { display: block; font-size: 11px; text-transform: uppercase; color: #888; font-weight: 700; margin-bottom: 4px; }
+  .input-group input, .input-group select {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #e2e0d8; border-radius: 9px;
+    font-size: 15px; background: #fff; color: #1e1e1e; outline: none;
   }
-  #customer:focus { border-color: #1f1f1f; }
+  .input-group input:focus, .input-group select:focus { border-color: #1f1f1f; }
 
   /* Table */
-  table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
-  th { text-align: left; font-size: 11px; color: #999; font-weight: 600; padding: 4px 6px;
-       text-transform: uppercase; letter-spacing: .05em; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  th { text-align: left; font-size: 11px; color: #999; font-weight: 700; padding: 4px 6px; text-transform: uppercase; letter-spacing: .05em; }
   td { padding: 3px 4px; }
   td input {
-    width: 100%; padding: 8px 10px; border: 1.5px solid #e8e8e8; border-radius: 8px;
-    font-size: 15px; outline: none; transition: border .15s; background: #fafafa;
+    width: 100%; padding: 8px 10px; border: 1.5px solid #e5e3dc; border-radius: 8px;
+    font-size: 14px; outline: none; background: #fafaf7;
   }
   td input:focus { border-color: #1f1f1f; background: #fff; }
   td.qty-cell  { width: 72px; }
   td.unit-cell { width: 90px; }
-  td.del-cell  { width: 36px; text-align: center; }
+  td.del-cell  { width: 34px; text-align: center; }
 
-  /* Delete row */
   .del-row {
-    background: none; border: none; cursor: pointer; font-size: 20px;
-    color: #ccc; line-height: 1; padding: 2px 6px; border-radius: 6px;
-    transition: color .15s;
+    background: none; border: none; cursor: pointer; font-size: 18px;
+    color: #bbb; line-height: 1; padding: 2px 4px; border-radius: 6px;
   }
-  .del-row:hover { color: #c0392b; }
+  .del-row:hover { color: #dc2626; }
 
-  /* Add row */
   #add-row {
-    background: none; border: 1.5px dashed #ccc; color: #888; cursor: pointer;
-    font-size: 14px; padding: 8px 14px; border-radius: 8px; margin-top: 8px;
-    transition: all .15s; width: 100%;
+    background: none; border: 1.5px dashed #ccc; color: #666; cursor: pointer;
+    font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px; margin-top: 8px; width: 100%;
   }
-  #add-row:hover { border-color: #888; color: #333; }
+  #add-row:hover { border-color: #444; color: #111; }
 
   /* Action buttons */
   .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
   .btn-save {
     font-size: 15px; padding: 12px 20px; border: 0; border-radius: 10px;
-    background: #1f1f1f; color: #fff; cursor: pointer; font-weight: 600; flex: 1;
-    transition: background .15s;
+    background: #1f1f1f; color: #fff; cursor: pointer; font-weight: 700; flex: 1;
   }
   .btn-save:hover { background: #333; }
   .btn-wa {
     font-size: 15px; padding: 12px 20px; border: 0; border-radius: 10px;
-    background: #25D366; color: #fff; cursor: pointer; font-weight: 600; flex: 1;
-    transition: background .15s;
+    background: #25D366; color: #fff; cursor: pointer; font-weight: 700; flex: 1;
   }
-  .btn-wa:hover { background: #1db954; }
+  .btn-wa:hover { background: #1eb954; }
 
-  /* Saved orders */
-  h2 { font-size: 20px; margin: 32px 0 0; }
-  #saved { min-height: 48px; }
-  .empty { color: #999; font-size: 15px; margin: 0; }
-  .order { border-top: 1px solid #f0f0f0; padding: 14px 0; }
-  .order:first-child { border-top: none; }
-  .order-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-  .order-customer { font-weight: 700; font-size: 16px; }
-  .order-time { font-size: 12px; color: #aaa; }
-  .order-item { font-size: 14px; color: #444; line-height: 1.9; }
-  .order-item::before { content: "• "; color: #bbb; }
-  .order-when { color: #aaa; font-style: italic; }
+  /* ── Stats Dashboard ── */
+  .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 28px 0 16px; }
+  .stat-card { background: #fff; border: 1px solid #ebe9e1; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .stat-card .stat-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: 700; margin-bottom: 2px; }
+  .stat-card .stat-val { font-size: 20px; font-weight: 800; color: #1e1e1e; }
+  .stat-card.alert .stat-val { color: #dc2626; }
+
+  /* Filter pills */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+  .filter-btn {
+    border: 1px solid #dcdad0; background: #fff; color: #666; font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all .15s;
+  }
+  .filter-btn.active { background: #1f1f1f; color: #fff; border-color: #1f1f1f; }
+
+  /* Orders Khata list */
+  .order-item-card {
+    background: #fff; border-radius: 14px; border: 1px solid #ebe9e1;
+    padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+  .order-cust { font-size: 17px; font-weight: 800; color: #111; }
+  .order-date { font-size: 12px; color: #999; }
+
+  .badge-group { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent;
+    user-select: none; transition: opacity .15s;
+  }
+  .badge:hover { opacity: .85; }
+  .badge.pending-del { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+  .badge.done-del    { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+  .badge.unpaid      { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+  .badge.paid        { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+
+  .order-lines { margin: 8px 0 12px; padding-left: 18px; color: #444; font-size: 14px; line-height: 1.7; }
+  .order-when-tag { color: #888; font-size: 12px; font-style: italic; }
+
+  .order-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0eee6; padding-top: 10px; }
+  .order-amount { font-weight: 800; font-size: 15px; color: #1e1e1e; }
+  .card-actions { display: flex; gap: 8px; }
+  .btn-wa-sm {
+    background: #25D366; color: #fff; border: 0; font-size: 12px; font-weight: 700;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  }
+  .btn-del-sm {
+    background: #f3f2ec; color: #888; border: 0; font-size: 12px; font-weight: 700;
+    padding: 6px 10px; border-radius: 8px; cursor: pointer;
+  }
+  .btn-del-sm:hover { color: #dc2626; background: #fee2e2; }
+  .empty-box { text-align: center; color: #999; padding: 24px 0; font-size: 14px; }
 </style>
 </head>
 <body>
 <main>
+  <span class="header-tag">Kirana Voice Assistant & Digital Khata</span>
   <h1>🎙️ Voice Order Notebook</h1>
-  <p class="sub">Say the order in Hindi or Hinglish. Powered by Gnani Prisma.</p>
+  <p class="sub">Say customer orders naturally in Hindi/Hinglish. Pre-orders & Udhaar notebook powered by Gnani Prisma.</p>
 
-  <button id="mic">🎤 Start recording</button>
-  <p id="status"></p>
+  <div class="record-bar">
+    <button id="mic">🎤 Start recording</button>
+    <div id="status"></div>
+  </div>
 
+  <!-- Active Order Card -->
   <section id="result" class="card" hidden>
-    <p class="label">What I heard</p>
-    <p id="transcript"></p>
+    <p class="label">Voice Transcript (Gnani Prisma)</p>
+    <div id="transcript"></div>
 
-    <p class="label">Customer</p>
-    <input id="customer" placeholder="Customer name">
+    <div class="meta-grid">
+      <div class="input-group">
+        <label>Customer Name (ग्राहक)</label>
+        <input id="customer" placeholder="e.g. शर्मा जी">
+      </div>
+      <div class="input-group">
+        <label>Total Bill ₹ (रकम)</label>
+        <input id="amount" type="number" placeholder="0">
+      </div>
+      <div class="input-group">
+        <label>Payment (पेमेंट)</label>
+        <select id="payment">
+          <option value="unpaid">📕 Udhaar / Unpaid (बाकी)</option>
+          <option value="paid">💰 Paid (नकद / पूरा)</option>
+        </select>
+      </div>
+    </div>
 
     <table>
       <thead>
@@ -127,34 +184,58 @@
           <th>Item</th>
           <th class="qty-cell">Qty</th>
           <th class="unit-cell">Unit</th>
-          <th>When</th>
+          <th>When (डिलीवरी)</th>
           <th class="del-cell"></th>
         </tr>
       </thead>
       <tbody id="rows"></tbody>
     </table>
 
-    <button id="add-row">+ Add item</button>
+    <button id="add-row">+ Add item manually</button>
 
     <div class="actions">
-      <button class="btn-save" id="save">💾 Save order</button>
-      <button class="btn-wa"   id="whatsapp">📲 Share on WhatsApp</button>
+      <button class="btn-save" id="save">💾 Save to Notebook / Khata</button>
+      <button class="btn-wa" id="whatsapp">📲 WhatsApp Bill</button>
     </div>
   </section>
 
-  <h2>Saved orders</h2>
-  <div id="saved" class="card"><p class="empty">No orders yet.</p></div>
+  <!-- Notebook & Khata Dashboard -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-title">Total Orders</div>
+      <div class="stat-val" id="stat-total">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Pending Delivery</div>
+      <div class="stat-val" id="stat-pending">0</div>
+    </div>
+    <div class="stat-card alert">
+      <div class="stat-title">Total Udhaar (बाकी)</div>
+      <div class="stat-val" id="stat-udhaar">₹0</div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All Orders (सभी)</button>
+    <button class="filter-btn" data-filter="pending">⏳ Pending Delivery</button>
+    <button class="filter-btn" data-filter="unpaid">📕 Udhaar (उधार बाकी)</button>
+    <button class="filter-btn" data-filter="completed">✅ Delivered</button>
+  </div>
+
+  <div id="orders-container"></div>
 </main>
 
 <script>
-const mic      = document.getElementById("mic");
+const mic = document.getElementById("mic");
 const statusEl = document.getElementById("status");
-const result   = document.getElementById("result");
+const result = document.getElementById("result");
 let recorder = null;
-let chunks   = [];
+let chunks = [];
+let allOrders = [];
+let activeFilter = "all";
 
 function esc(s) {
-  return String(s)
+  return String(s || "")
     .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
     .replace(/</g, "&lt;" ).replace(/>/g, "&gt;" );
 }
@@ -165,11 +246,11 @@ function setStatus(msg, spinning) {
     : esc(msg);
 }
 
-/* ── WAV encoder ── */
+/* ── WAV Encoder ── */
 function encodeWav(samples, rate) {
   const buf = new ArrayBuffer(44 + samples.length * 2);
-  const v   = new DataView(buf);
-  const w   = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  const v = new DataView(buf);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
   w(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); w(8, "WAVE");
   w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
   v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true);
@@ -184,13 +265,13 @@ function encodeWav(samples, rate) {
 }
 
 async function toWav(blob) {
-  const arr     = await blob.arrayBuffer();
-  const ctx     = new (window.AudioContext || window.webkitAudioContext)();
+  const arr = await blob.arrayBuffer();
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const decoded = await ctx.decodeAudioData(arr);
-  const rate    = 16000;
+  const rate = 16000;
   const offline = new OfflineAudioContext(1, Math.ceil(decoded.duration * rate), rate);
-  const src     = offline.createBufferSource();
-  src.buffer    = decoded;
+  const src = offline.createBufferSource();
+  src.buffer = decoded;
   src.connect(offline.destination);
   src.start();
   const rendered = await offline.startRendering();
@@ -198,13 +279,13 @@ async function toWav(blob) {
   return encodeWav(rendered.getChannelData(0), rate);
 }
 
-/* ── Recording ── */
+/* ── Voice Recording ── */
 mic.onclick = async () => {
   if (recorder && recorder.state === "recording") { recorder.stop(); return; }
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     recorder = new MediaRecorder(stream);
-    chunks   = [];
+    chunks = [];
     recorder.ondataavailable = (e) => chunks.push(e.data);
     recorder.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
@@ -213,9 +294,9 @@ mic.onclick = async () => {
       await processAudio(new Blob(chunks, { type: recorder.mimeType }));
     };
     recorder.start();
-    mic.textContent = "⏹ Stop";
+    mic.textContent = "⏹ Stop recording";
     mic.classList.add("rec");
-    setStatus("Listening… press Stop when done.");
+    setStatus("Listening... Speak in Hindi/Hinglish, then tap Stop.");
   } catch (e) {
     setStatus("Microphone error: " + e.message);
   }
@@ -223,19 +304,19 @@ mic.onclick = async () => {
 
 async function processAudio(blob) {
   try {
-    setStatus("Understanding your order…", true);
+    setStatus("Transcribing with Gnani Prisma...", true);
     const wav = await toWav(blob);
     const res = await fetch("/api/order", { method: "POST", body: wav });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Something went wrong");
+    if (!res.ok) throw new Error(data.error || "Server processing failed");
     showOrder(data);
-    setStatus("Check the order below — fix anything, then save.");
+    setStatus("Order parsed! Review details, payment & delivery, then save.");
   } catch (e) {
     setStatus("Error: " + e.message);
   }
 }
 
-/* ── Build a single table row ── */
+/* ── Populate Active Order ── */
 function makeRow(it) {
   const tr = document.createElement("tr");
   tr.innerHTML =
@@ -243,88 +324,201 @@ function makeRow(it) {
     '<td class="qty-cell"><input value="'  + esc(it.quantity) + '" type="number" min="0.5" step="0.5"></td>' +
     '<td class="unit-cell"><input value="' + esc(it.unit)     + '"></td>' +
     '<td><input value="'                   + esc(it.when)     + '"></td>' +
-    '<td class="del-cell"><button class="del-row" title="Remove row">×</button></td>';
+    '<td class="del-cell"><button class="del-row" title="Remove">×</button></td>';
   tr.querySelector(".del-row").onclick = () => tr.remove();
   return tr;
 }
 
 function showOrder(data) {
   document.getElementById("transcript").textContent = data.transcript;
-  document.getElementById("customer").value          = data.customer;
+  document.getElementById("customer").value = data.customer || "";
+  document.getElementById("amount").value = data.totalAmount || "";
+  document.getElementById("payment").value = data.payment || "unpaid";
+
   const rows = document.getElementById("rows");
   rows.innerHTML = "";
-  data.items.forEach((it) => rows.appendChild(makeRow(it)));
+  (data.items || []).forEach((it) => rows.appendChild(makeRow(it)));
   result.hidden = false;
+  result.scrollIntoView({ behavior: "smooth" });
 }
 
-/* Add blank row */
 document.getElementById("add-row").onclick = () => {
   document.getElementById("rows").appendChild(
     makeRow({ item: "", quantity: 1, unit: "pc", when: "Not specified" })
   );
 };
 
-/* ── Collect current table data ── */
-function collectOrder() {
+function collectActiveOrder() {
   const items = [...document.querySelectorAll("#rows tr")].map((tr) => {
     const f = tr.querySelectorAll("input");
     return { item: f[0].value, quantity: Number(f[1].value) || 1, unit: f[2].value, when: f[3].value };
   });
   return {
-    customer:   document.getElementById("customer").value || "Unknown",
+    customer: document.getElementById("customer").value || "Unknown",
+    totalAmount: Number(document.getElementById("amount").value) || 0,
+    payment: document.getElementById("payment").value,
+    status: "pending",
     transcript: document.getElementById("transcript").textContent,
     items,
   };
 }
 
-/* ── Save ── */
+/* ── Save Order ── */
 document.getElementById("save").onclick = async () => {
-  const body = collectOrder();
+  const body = collectActiveOrder();
   await fetch("/api/save", { method: "POST", body: JSON.stringify(body) });
   result.hidden = true;
-  setStatus("✅ Order saved.");
-  loadSaved();
+  setStatus("✅ Saved to Notebook!");
+  loadOrders();
 };
 
-/* ── WhatsApp share ── */
-document.getElementById("whatsapp").onclick = () => {
-  const { customer, items } = collectOrder();
-  const lines = ["*Order — " + customer + "*", ""];
-  items.forEach((it) => {
+/* ── WhatsApp formatted share ── */
+function formatWhatsAppText(order) {
+  const dateStr = new Date(order.savedAt || Date.now()).toLocaleDateString("en-IN");
+  const payLabel = order.payment === "paid" ? "✅ चुकता (Paid)" : "⚠️ बाकी / उधार (Unpaid Udhaar)";
+  const statusLabel = order.status === "delivered" ? "✅ डिलीवर हो गया" : "⏳ तैयार किया जा रहा है (Pending)";
+
+  const lines = [
+    "*🛍️ श्री किराना स्टोर (Voice Order Slip)*",
+    "-----------------------------",
+    "*ग्राहक (Customer):* " + (order.customer || "Customer"),
+    "*दिनांक (Date):* " + dateStr,
+    "",
+    "*सामान (Order Items):*",
+  ];
+
+  (order.items || []).forEach((it) => {
     const when = it.when && it.when !== "Not specified" ? " (" + it.when + ")" : "";
     lines.push("• " + it.quantity + " " + it.unit + " " + it.item + when);
   });
-  lines.push("", "_Via Voice Order Notebook · Gnani Prisma_");
-  window.open("https://wa.me/?text=" + encodeURIComponent(lines.join("\n")), "_blank");
-};
 
-/* ── Saved orders list ── */
-async function loadSaved() {
-  const res    = await fetch("/api/orders");
-  const orders = await res.json();
-  const box    = document.getElementById("saved");
-  if (!orders.length) {
-    box.innerHTML = '<p class="empty">No orders yet.</p>';
-    return;
+  lines.push("");
+  if (order.totalAmount) {
+    lines.push("*कुल बिल (Total):* ₹" + order.totalAmount);
   }
-  box.innerHTML = orders.map((o) =>
-    '<div class="order">' +
-      '<div class="order-header">' +
-        '<span class="order-customer">' + esc(o.customer) + '</span>' +
-        '<span class="order-time">'     + new Date(o.savedAt).toLocaleString("en-IN") + '</span>' +
-      '</div>' +
-      o.items.map((i) =>
-        '<div class="order-item">' +
-          esc(i.quantity + " " + i.unit + " " + i.item) +
-          (i.when && i.when !== "Not specified"
-            ? ' <span class="order-when">— ' + esc(i.when) + '</span>' : "") +
-        '</div>'
-      ).join("") +
-    "</div>"
-  ).join("");
+  lines.push("*पेमेंट:* " + payLabel);
+  lines.push("*डिलीवरी स्थिति:* " + statusLabel);
+  lines.push("-----------------------------");
+  lines.push("_Order created via Voice Order Notebook · Powered by Gnani Prisma_");
+
+  return encodeURIComponent(lines.join("\n"));
 }
 
-loadSaved();
+document.getElementById("whatsapp").onclick = () => {
+  const order = collectActiveOrder();
+  window.open("https://wa.me/?text=" + formatWhatsAppText(order), "_blank");
+};
+
+/* ── Khata Management API Calls ── */
+async function updateOrder(id, updates) {
+  await fetch("/api/order/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, updates })
+  });
+  loadOrders();
+}
+
+async function deleteOrder(id) {
+  if (!confirm("Are you sure you want to delete this order?")) return;
+  await fetch("/api/order/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  });
+  loadOrders();
+}
+
+/* ── Render Orders Notebook ── */
+async function loadOrders() {
+  const res = await fetch("/api/orders");
+  allOrders = await res.json();
+  renderDashboard();
+}
+
+function renderDashboard() {
+  // Compute Stats
+  const total = allOrders.length;
+  const pending = allOrders.filter(o => o.status !== "delivered").length;
+  const udhaar = allOrders
+    .filter(o => o.payment === "unpaid")
+    .reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
+
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-pending").textContent = pending;
+  document.getElementById("stat-udhaar").textContent = "₹" + udhaar.toLocaleString("en-IN");
+
+  // Filter
+  let filtered = allOrders;
+  if (activeFilter === "pending") filtered = allOrders.filter(o => o.status !== "delivered");
+  else if (activeFilter === "unpaid") filtered = allOrders.filter(o => o.payment === "unpaid");
+  else if (activeFilter === "completed") filtered = allOrders.filter(o => o.status === "delivered");
+
+  const container = document.getElementById("orders-container");
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty-box">No orders found in this view.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map((o) => {
+    const isDelivered = o.status === "delivered";
+    const isPaid = o.payment === "paid";
+    const delBadgeClass = isDelivered ? "done-del" : "pending-del";
+    const delBadgeText = isDelivered ? "✅ Delivered" : "⏳ Pending Delivery";
+    const payBadgeClass = isPaid ? "paid" : "unpaid";
+    const payBadgeText = isPaid
+      ? "💰 Paid" + (o.totalAmount ? " (₹" + o.totalAmount + ")" : "")
+      : "📕 Udhaar (₹" + (o.totalAmount || 0) + " बाकी)";
+
+    return `
+      <div class="order-item-card">
+        <div class="order-top">
+          <div>
+            <span class="order-cust">${esc(o.customer)}</span>
+            <div class="order-date">${new Date(o.savedAt).toLocaleString("en-IN")}</div>
+          </div>
+          <div class="badge-group">
+            <span class="badge ${delBadgeClass}" onclick="updateOrder(${o.id}, { status: '${isDelivered ? "pending" : "delivered"}' })" title="Click to toggle status">
+              ${delBadgeText}
+            </span>
+            <span class="badge ${payBadgeClass}" onclick="updateOrder(${o.id}, { payment: '${isPaid ? "unpaid" : "paid"}' })" title="Click to toggle payment">
+              ${payBadgeText}
+            </span>
+          </div>
+        </div>
+
+        <ul class="order-lines">
+          ${(o.items || []).map(i => `
+            <li>
+              <b>${esc(i.quantity)} ${esc(i.unit)}</b> ${esc(i.item)}
+              ${i.when && i.when !== "Not specified" ? `<span class="order-when-tag">— ${esc(i.when)}</span>` : ""}
+            </li>
+          `).join("")}
+        </ul>
+
+        <div class="order-footer">
+          <span class="order-amount">${o.totalAmount ? "Bill: ₹" + o.totalAmount : ""}</span>
+          <div class="card-actions">
+            <button class="btn-wa-sm" onclick="window.open('https://wa.me/?text=${formatWhatsAppText(o)}', '_blank')">📲 WhatsApp Slip</button>
+            <button class="btn-del-sm" onclick="deleteOrder(${o.id})">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// Filter tabs
+document.querySelectorAll(".filter-btn").forEach((btn) => {
+  btn.onclick = () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter = btn.dataset.filter;
+    renderDashboard();
+  };
+});
+
+loadOrders();
 </script>
 </body>
 </html>

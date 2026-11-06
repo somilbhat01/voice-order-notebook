@@ -108,6 +108,18 @@ function findTime(text) {
   return out.join(" ") || null;
 }
 
+/* ── Payment & Amount extraction ── */
+function findPayment(text) {
+  if (/paid|कैश|नकद|दे दिए|हो गया|पेमेंट कर दिया/i.test(text)) return "paid";
+  if (/उधार|बाकी|बाद में|खाता|खता|unpaid/i.test(text)) return "unpaid";
+  return "unpaid"; // default for kirana advance orders
+}
+
+function findAmount(text) {
+  const m = text.match(/(\d+(?:\.\d+)?)\s*(?:रुपये|रुपए|रूपये|rupees|rs\.?|inr)/i);
+  return m ? Number(m[1]) : "";
+}
+
 /* ── Pre-process: move size qualifiers that crossed a चाहिए boundary ──
    "2 तेल की बोतल चाहिए डेढ़ लीटर वाली और..." 
    → "2 तेल की बोतल डेढ़ लीटर वाली चाहिए और..."
@@ -187,7 +199,9 @@ function extractOrder(rawText) {
   if (items.length === 0) {
     items.push({ item: "", quantity: 1, unit: "pc", when: globalTime || "Not specified" });
   }
-  return { customer, items };
+  const payment = findPayment(text);
+  const totalAmount = findAmount(text);
+  return { customer, payment, totalAmount, status: "pending", items };
 }
 
 module.exports = { extractOrder };
