@@ -7,17 +7,18 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   body { font-family: -apple-system, system-ui, sans-serif; background: #f6f5f0; color: #1a1a1a; margin: 0; }
-  main { max-width: 740px; margin: 0 auto; padding: 32px 20px 80px; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
 
   /* Header */
   .header-tag { display: inline-block; font-size: 11px; font-weight: 700; color: #d97706; background: #fef3c7; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
   h1 { margin: 0 0 6px; font-size: 28px; font-weight: 800; }
   .sub { color: #666; margin: 0 0 24px; font-size: 15px; }
 
-  /* Record bar */
-  .record-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+  /* Record Section */
+  .record-wrapper { background: #fff; border: 1px solid #ebe8e1; border-radius: 16px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .record-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   #mic {
-    font-size: 15px; padding: 13px 22px; border: 0; border-radius: 12px;
+    font-size: 15px; padding: 12px 22px; border: 0; border-radius: 12px;
     background: #1a1a1a; color: #fff; cursor: pointer;
     display: inline-flex; align-items: center; gap: 8px;
     font-weight: 600; transition: background .15s, transform .05s;
@@ -27,13 +28,30 @@
   #mic.rec { background: #dc2626; animation: pulse 1.2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
 
-  #status { color: #666; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .rec-timer {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700;
+    color: #dc2626; background: #fee2e2; padding: 6px 12px; border-radius: 20px;
+    letter-spacing: .03em;
+  }
+  .rec-timer .dot { width: 8px; height: 8px; border-radius: 50%; background: #dc2626; animation: blink 1s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  #status { color: #666; font-size: 14px; display: flex; align-items: center; gap: 8px; min-height: 24px; }
   .spinner {
     width: 15px; height: 15px; border: 2px solid #ccc;
     border-top-color: #1a1a1a; border-radius: 50%;
     animation: spin .6s linear infinite; flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Sample Test Chips */
+  .sample-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f2efe9; flex-wrap: wrap; }
+  .sample-label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: #999; }
+  .sample-chip {
+    font-size: 12px; font-weight: 600; background: #f4f3ed; color: #444; border: 1px solid #e5e3dc;
+    padding: 5px 12px; border-radius: 20px; cursor: pointer; transition: all .15s;
+  }
+  .sample-chip:hover { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
 
   /* Card */
   .card { background: #fff; border-radius: 16px; padding: 20px; margin-top: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1px solid #ebe8e1; }
@@ -97,15 +115,22 @@
   .stat-card .stat-val { font-size: 20px; font-weight: 800; color: #1a1a1a; }
   .stat-card.alert .stat-val { color: #dc2626; }
 
-  /* Filter pills */
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+  /* Filter + Search Row */
+  .filter-search-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .filter-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
   .filter-btn {
-    border: 1px solid #dcdad0; background: #fff; color: #666; font-size: 13px; font-weight: 600;
-    padding: 6px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all .15s;
+    border: 1px solid #dcdad0; background: #fff; color: #666; font-size: 12px; font-weight: 600;
+    padding: 6px 13px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all .15s;
   }
   .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
 
-  /* ── Minimalist Order Card ── */
+  .search-box {
+    padding: 6px 12px; border: 1.5px solid #e0ded6; border-radius: 20px;
+    font-size: 13px; background: #fff; color: #1a1a1a; outline: none; min-width: 180px;
+  }
+  .search-box:focus { border-color: #1a1a1a; }
+
+  /* ── Order Card ── */
   .order-item-card {
     background: #fff; border-radius: 14px; border: 1px solid #ebe8e1;
     padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.03);
@@ -167,9 +192,20 @@
   <h1>🎙️ Voice Order Notebook</h1>
   <p class="sub">Speak orders in Hindi or Hinglish. Automatically track Pre-orders, Deliveries & Udhaar Khata.</p>
 
-  <div class="record-bar">
-    <button id="mic">🎤 Start recording</button>
-    <div id="status"></div>
+  <!-- Record Section -->
+  <div class="record-wrapper">
+    <div class="record-bar">
+      <button id="mic">🎤 Start recording</button>
+      <span id="rec-timer" class="rec-timer" hidden><span class="dot"></span> REC <span id="timer-val">00:00</span></span>
+      <div id="status"></div>
+    </div>
+
+    <!-- Quick Sample Demo Buttons (Great for Judges) -->
+    <div class="sample-row">
+      <span class="sample-label">⚡ Test Sample:</span>
+      <button class="sample-chip" id="btn-sample-1">Sharma ji (Atta & Oil · Udhaar)</button>
+      <button class="sample-chip" id="btn-sample-2">Verma ji (Pizza & Cold drink · UPI)</button>
+    </div>
   </div>
 
   <!-- Active Order Review Card -->
@@ -233,11 +269,14 @@
     </div>
   </div>
 
-  <div class="filter-bar">
-    <button class="filter-btn active" data-filter="all">All Orders (सभी)</button>
-    <button class="filter-btn" data-filter="pending">⏳ Pending Delivery (बाकी)</button>
-    <button class="filter-btn" data-filter="unpaid">📕 Udhaar (उधार)</button>
-    <button class="filter-btn" data-filter="completed">✅ Delivered (डिलीवर हो गए)</button>
+  <div class="filter-search-row">
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All Orders (सभी)</button>
+      <button class="filter-btn" data-filter="pending">⏳ Pending (बाकी)</button>
+      <button class="filter-btn" data-filter="unpaid">📕 Udhaar (उधार)</button>
+      <button class="filter-btn" data-filter="completed">✅ Delivered (डिलीवर हो गए)</button>
+    </div>
+    <input id="search-customer" class="search-box" type="text" placeholder="🔍 Search customer (उदा. शर्मा)...">
   </div>
 
   <div id="orders-container"></div>
@@ -251,6 +290,28 @@ let recorder = null;
 let chunks = [];
 let allOrders = [];
 let activeFilter = "all";
+let searchQuery = "";
+
+/* ── Live Recording Timer ── */
+let timerInterval = null;
+let secondsElapsed = 0;
+
+function startTimer() {
+  secondsElapsed = 0;
+  document.getElementById("timer-val").textContent = "00:00";
+  document.getElementById("rec-timer").hidden = false;
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
+    const secs = String(secondsElapsed % 60).padStart(2, "0");
+    document.getElementById("timer-val").textContent = `${mins}:${secs}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  document.getElementById("rec-timer").hidden = true;
+}
 
 function esc(s) {
   return String(s || "")
@@ -299,7 +360,11 @@ async function toWav(blob) {
 
 /* ── Voice Recording Handler ── */
 mic.onclick = async () => {
-  if (recorder && recorder.state === "recording") { recorder.stop(); return; }
+  if (recorder && recorder.state === "recording") {
+    recorder.stop();
+    stopTimer();
+    return;
+  }
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     recorder = new MediaRecorder(stream);
@@ -309,13 +374,16 @@ mic.onclick = async () => {
       stream.getTracks().forEach((t) => t.stop());
       mic.textContent = "🎤 Start recording";
       mic.classList.remove("rec");
+      stopTimer();
       await processAudio(new Blob(chunks, { type: recorder.mimeType }));
     };
     recorder.start();
+    startTimer();
     mic.textContent = "⏹ Stop recording";
     mic.classList.add("rec");
     setStatus("Listening... Speak in Hindi/Hinglish, then click Stop.");
   } catch (e) {
+    stopTimer();
     setStatus("Microphone error: " + e.message);
   }
 };
@@ -368,6 +436,37 @@ document.getElementById("add-row").onclick = () => {
   document.getElementById("rows").appendChild(
     makeRow({ item: "", quantity: 1, unit: "pc", when: "Not specified" })
   );
+};
+
+/* Quick Sample Handlers */
+document.getElementById("btn-sample-1").onclick = () => {
+  showOrder({
+    transcript: "शर्मा जी को 2 के जी आटा और 3 लीटर तेल कल सुबह चाहिए, 250 रुपये उधार लिख लो",
+    customer: "शर्मा जी",
+    totalAmount: 250,
+    payment: "unpaid",
+    paymentMethod: "Udhaar",
+    items: [
+      { item: "Atta", quantity: 2, unit: "kg", when: "Tomorrow morning" },
+      { item: "Oil", quantity: 3, unit: "litre", when: "Tomorrow morning" }
+    ]
+  });
+  setStatus("Sample order loaded for Sharma ji.");
+};
+
+document.getElementById("btn-sample-2").onclick = () => {
+  showOrder({
+    transcript: "वर्मा जी को 2 पिज़्ज़ा और 1 कोल्ड ड्रिंक शाम 05:00 बजे चाहिए, 350 रुपये UPI से दे दिए",
+    customer: "वर्मा जी",
+    totalAmount: 350,
+    payment: "paid",
+    paymentMethod: "UPI",
+    items: [
+      { item: "Pizza", quantity: 2, unit: "pc", when: "evening at 05:00" },
+      { item: "Cold drink", quantity: 1, unit: "pc", when: "evening at 05:00" }
+    ]
+  });
+  setStatus("Sample order loaded for Verma ji.");
 };
 
 function collectActiveOrder() {
@@ -477,15 +576,19 @@ function renderDashboard() {
   document.getElementById("stat-pending").textContent = pending;
   document.getElementById("stat-udhaar").textContent = "₹" + udhaar.toLocaleString("en-IN");
 
-  // Filter
+  // Filter & Search
   let filtered = allOrders;
   if (activeFilter === "pending") filtered = allOrders.filter(o => o.status !== "delivered");
   else if (activeFilter === "unpaid") filtered = allOrders.filter(o => o.payment === "unpaid");
   else if (activeFilter === "completed") filtered = allOrders.filter(o => o.status === "delivered");
 
+  if (searchQuery) {
+    filtered = filtered.filter(o => (o.customer || "").toLowerCase().includes(searchQuery));
+  }
+
   const container = document.getElementById("orders-container");
   if (!filtered.length) {
-    container.innerHTML = '<div class="empty-box">No orders in this view.</div>';
+    container.innerHTML = '<div class="empty-box">No orders match this filter or search.</div>';
     return;
   }
 
@@ -558,6 +661,12 @@ document.querySelectorAll(".filter-btn").forEach((btn) => {
     renderDashboard();
   };
 });
+
+// Search input logic
+document.getElementById("search-customer").oninput = (e) => {
+  searchQuery = e.target.value.toLowerCase().trim();
+  renderDashboard();
+};
 
 loadOrders();
 </script>
